@@ -7,19 +7,30 @@ import * as jwt from 'jsonwebtoken';
 import { NextFunction } from 'connect';
 
 import * as EmailValidator from 'email-validator';
+import { config } from '../../../../config/config';
+
+
 
 const router: Router = Router();
 
 async function generatePassword(plainTextPassword: string): Promise<string> {
     //@TODO Use Bcrypt to Generated Salted Hashed Passwords
+    const saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hash = await bcrypt.hash(plainTextPassword, salt);
+    return hash
 }
 
 async function comparePasswords(plainTextPassword: string, hash: string): Promise<boolean> {
     //@TODO Use Bcrypt to Compare your password to your Salted Hashed Password
+
+    return await bcrypt.compare(plainTextPassword, hash);
 }
 
 function generateJWT(user: User): string {
     //@TODO Use jwt to create a new JWT Payload containing
+
+    return jwt.sign(user, config.jwt.secret);
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
@@ -69,14 +80,14 @@ router.post('/login', async (req: Request, res: Response) => {
         return res.status(401).send({ auth: false, message: 'Unauthorized' });
     }
 
-    check that the password matches
+    // check that the password matches
     const authValid = await comparePasswords(password, user.password_hash)
 
     if(!authValid) {
         return res.status(401).send({ auth: false, message: 'Unauthorized' });
     }
 
-    Generate JWT
+    // Generate JWT
     const jwt = generateJWT(user);
 
     res.status(200).send({ auth: true, token: jwt, user: user.short()});
@@ -117,7 +128,7 @@ router.post('/', async (req: Request, res: Response) => {
         throw e;
     }
 
-    Generate JWT
+    // Generate JWT
     const jwt = generateJWT(savedUser);
 
     res.status(201).send({token: jwt, user: savedUser.short()});
