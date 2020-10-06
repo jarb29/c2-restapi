@@ -13,6 +13,12 @@ export const s3 = new AWS.S3({
   params: {Bucket: c.aws_media_bucket}
 });
 
+//Configure AWS
+if(c.aws_profile !== "DEPLOYED") {
+  var credentials = new AWS.SharedIniFileCredentials({profile: 'default'});
+  AWS.config.credentials = credentials;
+}
+
 
 /* getGetSignedUrl generates an aws signed url to retreive an item
  * @Params
