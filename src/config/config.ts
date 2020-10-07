@@ -17,6 +17,6 @@ export const config = {
     "dialect": process.env.AWS_DIALECT
   },
   "jwt":{
-    "secret":"helloworld"
+    "secret":process.env.AWS_JWT
   }
 }
